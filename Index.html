@@ -1,0 +1,943 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Amoura Luxe — Private Collection</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Didact+Gothic&family=Jost:wght@200;300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --ac:#B8972A;--ac2:#d4af37;--bg:#faf8f5;--dark:#0a0a0a;
+  --s1:#f5f2ee;--s2:#ede9e3;--tx:#1a1a1a;--tx2:#7a7570;
+  --border:#e0dbd3;--white:#ffffff;
+  --tr:0.5s cubic-bezier(.16,1,.3,1);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--tx);font-family:'Jost',sans-serif;font-weight:300;overflow-x:hidden}
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--ac)}
+
+/* ── TOP ANNOUNCEMENT BAR ── */
+.announce{background:var(--dark);color:#fff;text-align:center;padding:10px;font-size:.65rem;letter-spacing:.35em;text-transform:uppercase}
+.announce span{color:var(--ac2)}
+
+/* ── LOGIN WALL ── */
+#lw{
+  position:fixed;inset:0;z-index:3000;
+  background:var(--dark);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  transition:opacity .8s ease,transform .8s ease
+}
+#lw.out{opacity:0;transform:scale(1.03);pointer-events:none}
+.lw-logo{
+  font-family:'Playfair Display',serif;font-size:clamp(2rem,5vw,3.5rem);
+  font-weight:400;letter-spacing:.25em;color:var(--ac2);
+  text-transform:uppercase;margin-bottom:6px
+}
+.lw-logo em{font-style:italic;font-weight:400}
+.lw-sub{font-size:.6rem;letter-spacing:.6em;color:#888;text-transform:uppercase;margin-bottom:56px}
+.lw-divline{width:60px;height:1px;background:var(--ac);margin:0 auto 48px}
+.lw-form{display:flex;flex-direction:column;gap:0;width:min(340px,88vw)}
+.lw-field{
+  background:transparent;border:none;border-bottom:1px solid #333;
+  color:#fff;font-family:'Jost';font-weight:300;font-size:.85rem;
+  letter-spacing:.08em;padding:16px 2px;outline:none;transition:border-color .3s;margin-bottom:16px
+}
+.lw-field::placeholder{color:#555;letter-spacing:.1em}
+.lw-field:focus{border-bottom-color:var(--ac2)}
+.btn-enter{
+  background:var(--ac);color:var(--dark);font-family:'Jost';
+  font-size:.7rem;font-weight:600;letter-spacing:.4em;text-transform:uppercase;
+  padding:18px;border:none;cursor:pointer;transition:background .3s,transform .2s;margin-top:8px
+}
+.btn-enter:hover{background:var(--ac2);transform:translateY(-1px)}
+.lw-or{display:flex;align-items:center;gap:14px;margin:20px 0 4px}
+.lw-or::before,.lw-or::after{content:'';flex:1;height:1px;background:#222}
+.lw-or span{font-size:.58rem;letter-spacing:.3em;color:#555;text-transform:uppercase}
+.btn-guest{
+  background:transparent;border:1px solid #333;color:#777;
+  font-family:'Jost';font-size:.67rem;letter-spacing:.3em;
+  text-transform:uppercase;padding:16px;cursor:pointer;transition:all .3s
+}
+.btn-guest:hover{border-color:var(--ac);color:var(--ac)}
+
+/* ── APP ── */
+#app{opacity:0;transform:translateY(10px);transition:opacity .8s ease .1s,transform .8s ease .1s;pointer-events:none}
+#app.on{opacity:1;transform:none;pointer-events:all}
+
+/* ── HEADER ── */
+header{
+  position:sticky;top:0;z-index:900;background:var(--white);
+  border-bottom:1px solid var(--border);
+}
+.hbar{
+  max-width:1400px;margin:0 auto;
+  padding:0 clamp(16px,4vw,60px);height:72px;
+  display:flex;align-items:center;justify-content:space-between;gap:20px
+}
+.hlogo{
+  font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:500;
+  letter-spacing:.2em;color:var(--dark);text-transform:uppercase;white-space:nowrap
+}
+.hlogo em{font-style:italic;color:var(--ac)}
+.hnav{display:flex;gap:0;list-style:none}
+.hnav li a{
+  font-size:.68rem;letter-spacing:.22em;text-transform:uppercase;
+  color:var(--tx2);text-decoration:none;padding:8px 18px;
+  transition:color .25s;display:block
+}
+.hnav li a:hover{color:var(--dark)}
+.hacts{display:flex;align-items:center;gap:20px}
+.hico{background:none;border:none;cursor:pointer;color:var(--tx);padding:4px;transition:color .2s}
+.hico:hover{color:var(--ac)}
+.cart-rel{position:relative}
+.cbadge{
+  position:absolute;top:-5px;right:-7px;
+  background:var(--dark);color:#fff;font-size:.5rem;font-weight:700;
+  width:16px;height:16px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center
+}
+.cbadge.pop{animation:cpop .35s ease}
+@keyframes cpop{0%,100%{transform:scale(1)}45%{transform:scale(1.6)}}
+
+/* ── HERO ── */
+.hero{position:relative;overflow:hidden;height:92vh;min-height:560px;background:var(--dark)}
+.hslide{position:absolute;inset:0;opacity:0;transition:opacity 1.2s ease}
+.hslide.on{opacity:1;z-index:2}
+.hslide-img{
+  position:absolute;inset:0;background-size:cover;background-position:center;
+  transform:scale(1.04);transition:transform 8s ease
+}
+.hslide.on .hslide-img{transform:scale(1)}
+.hslide-over{
+  position:absolute;inset:0;
+  background:linear-gradient(90deg,rgba(10,10,10,.72) 0%,rgba(10,10,10,.2) 55%,transparent 100%)
+}
+.hcont{
+  position:relative;z-index:3;height:100%;
+  max-width:1400px;margin:0 auto;padding:0 clamp(20px,6vw,100px);
+  display:flex;flex-direction:column;justify-content:center;max-width:620px
+}
+.hey{
+  font-size:.6rem;letter-spacing:.55em;text-transform:uppercase;
+  color:var(--ac2);margin-bottom:20px;display:flex;align-items:center;gap:14px
+}
+.hey::before{content:'';width:32px;height:1px;background:var(--ac2)}
+.htitle{
+  font-family:'Playfair Display',serif;
+  font-size:clamp(2.6rem,5.5vw,5rem);
+  font-weight:400;line-height:1.1;color:#fff;margin-bottom:24px
+}
+.htitle em{font-style:italic;color:var(--ac2)}
+.hdesc{
+  font-size:.82rem;line-height:1.95;letter-spacing:.04em;
+  color:rgba(255,255,255,.65);max-width:360px;margin-bottom:40px
+}
+.btn-hero{
+  display:inline-flex;align-items:center;gap:12px;
+  background:var(--ac);color:var(--dark);
+  font-family:'Jost';font-size:.68rem;font-weight:600;
+  letter-spacing:.35em;text-transform:uppercase;
+  padding:16px 36px;border:none;cursor:pointer;text-decoration:none;
+  transition:background .3s,transform .2s
+}
+.btn-hero:hover{background:var(--ac2);transform:translateY(-2px)}
+.hdots{
+  position:absolute;bottom:32px;left:clamp(20px,6vw,100px);
+  z-index:10;display:flex;gap:8px;align-items:center
+}
+.hdot{width:24px;height:2px;background:rgba(255,255,255,.3);cursor:pointer;transition:all .4s}
+.hdot.on{width:44px;background:var(--ac2)}
+
+/* ── MARQUEE ── */
+.mqwrap{
+  background:var(--dark);overflow:hidden;
+  border-top:1px solid #1a1a1a;border-bottom:1px solid #1a1a1a;
+  padding:14px 0
+}
+.mqtrack{display:flex;white-space:nowrap;animation:mq 32s linear infinite}
+.mqitem{
+  display:inline-flex;align-items:center;gap:24px;
+  font-size:.6rem;letter-spacing:.4em;text-transform:uppercase;
+  color:#666;padding:0 28px
+}
+.mqitem .dot{width:3px;height:3px;border-radius:50%;background:var(--ac);flex-shrink:0}
+@keyframes mq{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+/* ── CATEGORY TILES ── */
+.cats{
+  max-width:1400px;margin:0 auto;padding:72px clamp(16px,4vw,60px);
+}
+.cats-title{
+  font-family:'Playfair Display',serif;font-size:clamp(1.6rem,3vw,2.4rem);
+  font-weight:400;text-align:center;margin-bottom:8px
+}
+.cats-sub{text-align:center;font-size:.75rem;letter-spacing:.2em;color:var(--tx2);text-transform:uppercase;margin-bottom:48px}
+.cat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+@media(max-width:700px){.cat-grid{grid-template-columns:1fr 1fr}}
+.cat-tile{
+  position:relative;overflow:hidden;cursor:pointer;
+  aspect-ratio:3/4;background:#1a1a1a
+}
+.cat-tile:first-child{grid-row:span 2;aspect-ratio:auto}
+.cat-tile img{
+  width:100%;height:100%;object-fit:cover;
+  transition:transform .8s cubic-bezier(.16,1,.3,1)
+}
+.cat-tile:hover img{transform:scale(1.06)}
+.cat-tile-over{
+  position:absolute;inset:0;
+  background:linear-gradient(to top,rgba(0,0,0,.7) 0%,rgba(0,0,0,.1) 50%,transparent 100%)
+}
+.cat-tile-lbl{
+  position:absolute;bottom:24px;left:24px;right:24px;
+}
+.cat-tile-name{
+  font-family:'Playfair Display',serif;
+  font-size:clamp(1.1rem,2vw,1.5rem);font-weight:400;
+  color:#fff;margin-bottom:6px
+}
+.cat-tile-btn{
+  font-size:.6rem;letter-spacing:.3em;text-transform:uppercase;
+  color:var(--ac2);text-decoration:none;
+  display:inline-flex;align-items:center;gap:8px
+}
+.cat-tile-btn::after{content:'→'}
+
+/* ── FILTER BAR ── */
+.fbar{
+  background:var(--white);border-top:1px solid var(--border);border-bottom:1px solid var(--border);
+  position:sticky;top:72px;z-index:800;
+}
+.fbar-inner{
+  max-width:1400px;margin:0 auto;
+  padding:0 clamp(16px,4vw,60px);
+  display:flex;align-items:center;gap:0;overflow-x:auto;
+}
+.fbar-inner::-webkit-scrollbar{height:0}
+.fbtn{
+  font-family:'Jost';font-size:.65rem;font-weight:400;
+  letter-spacing:.25em;text-transform:uppercase;
+  background:transparent;border:none;border-bottom:2px solid transparent;
+  color:var(--tx2);padding:18px 22px;cursor:pointer;white-space:nowrap;
+  transition:color .25s,border-color .25s
+}
+.fbtn:hover{color:var(--dark)}
+.fbtn.on{color:var(--dark);border-bottom-color:var(--dark);font-weight:500}
+.fbar-right{margin-left:auto;display:flex;align-items:center;gap:12px;flex-shrink:0;padding-left:20px}
+.age-sel{
+  background:transparent;border:1px solid var(--border);
+  color:var(--tx2);font-family:'Jost';font-size:.62rem;
+  letter-spacing:.15em;padding:8px 14px;cursor:pointer;outline:none;
+  transition:border-color .2s
+}
+.age-sel option{background:var(--white);color:var(--dark)}
+.age-sel:focus{border-color:var(--dark)}
+
+/* ── SHOP ── */
+.shop{max-width:1400px;margin:0 auto;padding:56px clamp(16px,4vw,60px)}
+.sh-hd{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:40px;gap:16px;flex-wrap:wrap}
+.sh-ey{font-size:.58rem;letter-spacing:.45em;text-transform:uppercase;color:var(--ac);margin-bottom:10px}
+.sh-ti{font-family:'Playfair Display',serif;font-size:clamp(1.6rem,2.8vw,2.3rem);font-weight:400}
+.sh-ct{font-size:.68rem;letter-spacing:.2em;color:var(--tx2)}
+
+/* ── PRODUCT GRID ── */
+.pgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(260px,100%),1fr));gap:1px;background:var(--border)}
+.pcard{
+  background:var(--white);cursor:pointer;
+  transition:box-shadow .4s
+}
+.pcard:hover{box-shadow:0 12px 40px rgba(0,0,0,.12);z-index:2;position:relative}
+.cimgwrap{
+  position:relative;overflow:hidden;aspect-ratio:3/4;background:var(--s2)
+}
+.cimgwrap img{
+  width:100%;height:100%;object-fit:cover;
+  transition:transform .8s cubic-bezier(.16,1,.3,1)
+}
+.pcard:hover .cimgwrap img{transform:scale(1.05)}
+.cbdg{
+  position:absolute;top:14px;left:14px;z-index:2;
+  background:var(--dark);color:#fff;
+  font-size:.52rem;letter-spacing:.28em;text-transform:uppercase;
+  padding:5px 11px;font-weight:500
+}
+.cbdg.sale{background:var(--ac);color:var(--dark)}
+.cov{
+  position:absolute;inset:0;
+  background:rgba(10,10,10,.35);
+  opacity:0;transition:opacity .3s;
+  display:flex;align-items:center;justify-content:center
+}
+.pcard:hover .cov{opacity:1}
+.qv{
+  background:var(--white);color:var(--dark);
+  font-size:.62rem;letter-spacing:.28em;text-transform:uppercase;
+  padding:13px 28px;border:none;cursor:pointer;font-family:'Jost';font-weight:500;
+  transition:background .25s,color .25s
+}
+.qv:hover{background:var(--dark);color:#fff}
+.cbody{padding:16px 18px 20px}
+.ccol{font-size:.55rem;letter-spacing:.4em;text-transform:uppercase;color:var(--ac);margin-bottom:6px}
+.cname{font-family:'Playfair Display',serif;font-size:1.05rem;font-weight:400;line-height:1.3;margin-bottom:4px}
+.csub{font-size:.68rem;color:var(--tx2);letter-spacing:.03em;margin-bottom:14px}
+.cft{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.cprice{font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:500;color:var(--dark)}
+.cold{font-size:.72rem;color:var(--tx2);text-decoration:line-through;margin-left:4px}
+.addbtn{
+  background:var(--dark);color:#fff;border:none;
+  font-family:'Jost';font-size:.57rem;font-weight:500;
+  letter-spacing:.22em;text-transform:uppercase;
+  padding:10px 14px;cursor:pointer;transition:background .25s;white-space:nowrap
+}
+.addbtn:hover{background:var(--ac);color:var(--dark)}
+.addbtn.done{background:var(--ac);color:var(--dark)}
+
+/* ── EDITORIAL STRIP ── */
+.editorial{
+  background:var(--dark);padding:80px clamp(16px,6vw,100px);
+  display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center;
+  max-width:none
+}
+@media(max-width:768px){.editorial{grid-template-columns:1fr}.hnav{display:none}}
+.ed-ey{font-size:.58rem;letter-spacing:.5em;text-transform:uppercase;color:var(--ac);margin-bottom:16px}
+.ed-ti{
+  font-family:'Playfair Display',serif;
+  font-size:clamp(1.8rem,3vw,2.8rem);font-weight:400;color:#fff;
+  line-height:1.2;margin-bottom:22px
+}
+.ed-ti em{font-style:italic;color:var(--ac2)}
+.ed-p{font-size:.8rem;line-height:2;color:#888;margin-bottom:36px}
+.ed-stats{display:flex;gap:36px;flex-wrap:wrap}
+.sn{font-family:'Playfair Display',serif;font-size:2.2rem;font-weight:400;color:var(--ac2);line-height:1}
+.sl{font-size:.6rem;letter-spacing:.28em;text-transform:uppercase;color:#666;margin-top:5px}
+.ed-imgs{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.ed-img{
+  aspect-ratio:1;overflow:hidden;background:#1a1a1a
+}
+.ed-img:first-child{grid-row:span 2;aspect-ratio:auto}
+.ed-img img{width:100%;height:100%;object-fit:cover;transition:transform .7s ease}
+.ed-img:hover img{transform:scale(1.06)}
+
+/* ── FOOTER ── */
+footer{background:var(--dark);color:#aaa;padding:56px clamp(16px,4vw,60px) 28px;border-top:1px solid #1a1a1a}
+.ftop{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:48px;margin-bottom:48px}
+@media(max-width:860px){.ftop{grid-template-columns:1fr 1fr}}
+.fbrand{
+  font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:400;
+  letter-spacing:.2em;color:var(--ac2);text-transform:uppercase;margin-bottom:14px
+}
+.ftagline{font-size:.74rem;line-height:1.9;color:#666;max-width:240px}
+.fcol h4{font-size:.58rem;letter-spacing:.38em;text-transform:uppercase;color:var(--ac);margin-bottom:16px}
+.fcol ul{list-style:none;display:flex;flex-direction:column;gap:9px}
+.fcol a{font-size:.74rem;color:#666;text-decoration:none;transition:color .25s;letter-spacing:.04em}
+.fcol a:hover{color:var(--ac2)}
+.fbot{display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;padding-top:28px;border-top:1px solid #1a1a1a}
+.fcp{font-size:.62rem;letter-spacing:.2em;color:#444}
+
+/* ── CHAT ── */
+#cfab{
+  position:fixed;bottom:28px;right:28px;z-index:1800;
+  width:56px;height:56px;border-radius:50%;
+  background:var(--dark);border:2px solid var(--ac);
+  cursor:pointer;display:flex;align-items:center;justify-content:center;
+  color:#fff;box-shadow:0 8px 28px rgba(0,0,0,.28);
+  transition:transform .3s,background .3s
+}
+#cfab:hover{transform:scale(1.08);background:var(--ac);color:var(--dark)}
+#cwin{
+  position:fixed;bottom:96px;right:28px;z-index:1799;
+  width:min(370px,calc(100vw - 32px));height:480px;
+  background:var(--white);border:1px solid var(--border);
+  box-shadow:0 20px 60px rgba(0,0,0,.18);
+  display:flex;flex-direction:column;
+  opacity:0;transform:translateY(16px) scale(.97);pointer-events:none;
+  transition:opacity .3s ease,transform .3s ease
+}
+#cwin.on{opacity:1;transform:none;pointer-events:all}
+.chd{
+  padding:14px 16px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:12px;background:var(--dark)
+}
+.cavt{
+  width:32px;height:32px;border-radius:50%;
+  background:var(--ac);display:flex;align-items:center;justify-content:center;
+  font-size:.9rem;flex-shrink:0
+}
+.ctitle{font-family:'Playfair Display',serif;font-size:.95rem;color:#fff}
+.cst{font-size:.55rem;letter-spacing:.2em;color:#4ade80;text-transform:uppercase}
+.ccl{margin-left:auto;background:none;border:none;color:#888;cursor:pointer;font-size:1rem}
+.ccl:hover{color:#fff}
+.cmsgs{
+  flex:1;overflow-y:auto;padding:16px;
+  display:flex;flex-direction:column;gap:12px;background:var(--s1)
+}
+.cmsgs::-webkit-scrollbar{width:2px}
+.cmsgs::-webkit-scrollbar-thumb{background:var(--ac)}
+.cmsg{max-width:85%;display:flex;flex-direction:column;gap:3px}
+.cmsg.u{align-self:flex-end;align-items:flex-end}
+.cmsg.b{align-self:flex-start}
+.mb{padding:10px 14px;font-size:.78rem;line-height:1.7;border-radius:2px}
+.cmsg.b .mb{background:var(--white);border:1px solid var(--border);color:var(--tx)}
+.cmsg.u .mb{background:var(--dark);color:#fff}
+.mt{font-size:.55rem;color:var(--tx2);letter-spacing:.12em}
+.typi{display:flex;gap:4px;align-items:center;padding:12px 14px;background:var(--white);border:1px solid var(--border);width:fit-content}
+.td{width:6px;height:6px;border-radius:50%;background:var(--ac);animation:tp 1.4s ease infinite}
+.td:nth-child(2){animation-delay:.2s}
+.td:nth-child(3){animation-delay:.4s}
+@keyframes tp{0%,80%,100%{opacity:.28;transform:scale(.78)}42%{opacity:1;transform:scale(1)}}
+.cinrow{
+  padding:12px 14px;border-top:1px solid var(--border);
+  display:flex;gap:8px;align-items:center;background:var(--white)
+}
+.cinp{
+  flex:1;background:var(--s1);border:1px solid var(--border);
+  color:var(--tx);font-family:'Jost';font-size:.76rem;letter-spacing:.03em;
+  padding:10px 12px;outline:none;transition:border-color .25s
+}
+.cinp:focus{border-color:var(--dark)}
+.csend{
+  background:var(--dark);border:none;color:#fff;
+  width:36px;height:36px;cursor:pointer;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  transition:background .25s
+}
+.csend:hover{background:var(--ac);color:var(--dark)}
+
+/* ── TOAST ── */
+#toast{
+  position:fixed;bottom:100px;left:50%;
+  transform:translateX(-50%) translateY(8px);
+  background:var(--dark);color:#fff;
+  font-size:.7rem;letter-spacing:.18em;
+  padding:12px 26px;z-index:1600;
+  opacity:0;transition:opacity .28s,transform .28s;
+  pointer-events:none;white-space:nowrap;border-left:3px solid var(--ac)
+}
+#toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ── EMPTY STATE ── */
+.empty{
+  grid-column:1/-1;text-align:center;padding:80px 20px;
+  color:var(--tx2);font-size:.78rem;letter-spacing:.25em;text-transform:uppercase
+}
+.empty svg{display:block;margin:0 auto 20px;opacity:.3}
+
+@media(max-width:600px){
+  .cat-grid{grid-template-columns:1fr}
+  .cat-tile:first-child{grid-row:auto}
+}
+</style>
+</head>
+<body>
+
+<!-- ANNOUNCEMENT -->
+<div class="announce">Complimentary Express Shipping on all orders above <span>Rs. 50,000</span> — Worldwide Delivery Available</div>
+
+<!-- LOGIN WALL -->
+<div id="lw">
+  <div class="lw-logo">Amoura <em>Luxe</em></div>
+  <div class="lw-sub">Private Collection Access</div>
+  <div class="lw-divline"></div>
+  <div class="lw-form">
+    <input class="lw-field" type="email" placeholder="Email Address"/>
+    <input class="lw-field" type="password" placeholder="Password"/>
+    <button class="btn-enter" onclick="doLogin()">Enter the Collection</button>
+    <div class="lw-or"><span>or continue as</span></div>
+    <button class="btn-guest" onclick="doLogin()">Guest Access — Browse Freely</button>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+
+<!-- HEADER -->
+<header>
+  <div class="hbar">
+    <div class="hlogo">Amoura <em>Luxe</em></div>
+    <ul class="hnav" id="hnav">
+      <li><a href="#shop">Collections</a></li>
+      <li><a href="#editorial">Maison</a></li>
+      <li><a href="#">Ateliers</a></li>
+      <li><a href="#">Bespoke</a></li>
+      <li><a href="#">Gifting</a></li>
+    </ul>
+    <div class="hacts">
+      <button class="hico" onclick="showToast('Search coming soon')">
+        <svg width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+      </button>
+      <button class="hico cart-rel" onclick="openCart()">
+        <svg width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M6 2 3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+        <span class="cbadge" id="cbadge">0</span>
+      </button>
+      <button class="hico" onclick="showToast('Profile coming soon')">
+        <svg width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hslide on" id="sl0">
+    <div class="hslide-img" style="background-image:url('https://images.unsplash.com/photo-1541643600914-78b084683702?w=1600&q=80')"></div>
+    <div class="hslide-over"></div>
+    <div class="hcont">
+      <div class="hey">Autumn Collection 2026</div>
+      <h1 class="htitle">The Art of<br><em>Rare Perfume</em></h1>
+      <p class="hdesc">Hand-distilled essences from the world's rarest botanicals. Each flacon a sculpture; each fragrance, a sealed memory.</p>
+      <a href="#shop" class="btn-hero">Discover Now</a>
+    </div>
+  </div>
+  <div class="hslide" id="sl1">
+    <div class="hslide-img" style="background-image:url('https://images.unsplash.com/photo-1547996160-81dfa63595aa?w=1600&q=80')"></div>
+    <div class="hslide-over"></div>
+    <div class="hcont">
+      <div class="hey">Horological Excellence</div>
+      <h1 class="htitle">Icons of<br><em>Swiss Time</em></h1>
+      <p class="hdesc">Patek Philippe. Rolex. The most coveted timepieces on earth — available through our private acquisition service.</p>
+      <a href="#shop" class="btn-hero">Explore Watches</a>
+    </div>
+  </div>
+  <div class="hslide" id="sl2">
+    <div class="hslide-img" style="background-image:url('https://images.unsplash.com/photo-1558769132-cb1aea458c5e?w=1600&q=80')"></div>
+    <div class="hslide-over"></div>
+    <div class="hcont">
+      <div class="hey">Girls & Kids — Royal Pink</div>
+      <h1 class="htitle">Little Royals<br><em>Deserve More</em></h1>
+      <p class="hdesc">Rose-gold finishes and the softest silks. Crafted for the most important people in your story.</p>
+      <a href="#shop" class="btn-hero">Shop Kids</a>
+    </div>
+  </div>
+  <div class="hslide" id="sl3">
+    <div class="hslide-img" style="background-image:url('https://images.unsplash.com/photo-1612036782180-6f0b6cd846fe?w=1600&q=80')"></div>
+    <div class="hslide-over"></div>
+    <div class="hcont">
+      <div class="hey">Luxury Sports Edit</div>
+      <h1 class="htitle">Icons Wear<br><em>Amoura</em></h1>
+      <p class="hdesc">Couture concept jerseys bearing the names of Ronaldo, Messi, and Neymar — where sport meets luxury craft.</p>
+      <a href="#shop" class="btn-hero">Shop Sports Edit</a>
+    </div>
+  </div>
+  <div class="hdots">
+    <div class="hdot on" onclick="goSlide(0)"></div>
+    <div class="hdot" onclick="goSlide(1)"></div>
+    <div class="hdot" onclick="goSlide(2)"></div>
+    <div class="hdot" onclick="goSlide(3)"></div>
+  </div>
+</section>
+
+<!-- MARQUEE -->
+<div class="mqwrap">
+  <div class="mqtrack">
+    <div class="mqitem"><div class="dot"></div>Complimentary Gift Wrapping<div class="dot"></div>Worldwide Express Delivery<div class="dot"></div>Bespoke Engraving<div class="dot"></div>Private Concierge<div class="dot"></div>Certificate of Authenticity<div class="dot"></div>Exclusive Member Benefits<div class="dot"></div>Sustainable Packaging<div class="dot"></div>Free Returns Within 30 Days</div>
+    <div class="mqitem"><div class="dot"></div>Complimentary Gift Wrapping<div class="dot"></div>Worldwide Express Delivery<div class="dot"></div>Bespoke Engraving<div class="dot"></div>Private Concierge<div class="dot"></div>Certificate of Authenticity<div class="dot"></div>Exclusive Member Benefits<div class="dot"></div>Sustainable Packaging<div class="dot"></div>Free Returns Within 30 Days</div>
+  </div>
+</div>
+
+<!-- CATEGORY TILES -->
+<section class="cats">
+  <h2 class="cats-title">Our Collections</h2>
+  <p class="cats-sub">Curated with obsessive precision</p>
+  <div class="cat-grid">
+    <div class="cat-tile" onclick="filterClick('gents')">
+      <img src="https://images.unsplash.com/photo-1547996160-81dfa63595aa?w=900&q=80" alt="Gents"/>
+      <div class="cat-tile-over"></div>
+      <div class="cat-tile-lbl">
+        <div class="cat-tile-name">Gents Collection</div>
+        <a class="cat-tile-btn">Watches & Accessories</a>
+      </div>
+    </div>
+    <div class="cat-tile" onclick="filterClick('perfumes')">
+      <img src="https://images.unsplash.com/photo-1541643600914-78b084683702?w=700&q=80" alt="Perfumes"/>
+      <div class="cat-tile-over"></div>
+      <div class="cat-tile-lbl">
+        <div class="cat-tile-name">Perfumes</div>
+        <a class="cat-tile-btn">The Fragrance Atelier</a>
+      </div>
+    </div>
+    <div class="cat-tile" onclick="filterClick('girls')">
+      <img src="https://images.unsplash.com/photo-1518831959646-742c3a14ebf7?w=700&q=80" alt="Girls"/>
+      <div class="cat-tile-over"></div>
+      <div class="cat-tile-lbl">
+        <div class="cat-tile-name">Girls & Kids</div>
+        <a class="cat-tile-btn">Little Royals Edit</a>
+      </div>
+    </div>
+    <div class="cat-tile" onclick="filterClick('apparel')">
+      <img src="https://images.unsplash.com/photo-1558769132-cb1aea458c5e?w=700&q=80" alt="Apparel"/>
+      <div class="cat-tile-over"></div>
+      <div class="cat-tile-lbl">
+        <div class="cat-tile-name">Apparel</div>
+        <a class="cat-tile-btn">The Wardrobe</a>
+      </div>
+    </div>
+    <div class="cat-tile" onclick="filterClick('sports')">
+      <img src="https://images.unsplash.com/photo-1612036782180-6f0b6cd846fe?w=700&q=80" alt="Sports"/>
+      <div class="cat-tile-over"></div>
+      <div class="cat-tile-lbl">
+        <div class="cat-tile-name">Sports Edit</div>
+        <a class="cat-tile-btn">Icons in Couture</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FILTER BAR -->
+<div class="fbar" id="shop">
+  <div class="fbar-inner">
+    <button class="fbtn on" data-cat="all" onclick="setFilter('all',this)">All Pieces</button>
+    <button class="fbtn" data-cat="gents" id="fb-gents" onclick="setFilter('gents',this)">Gents</button>
+    <button class="fbtn" data-cat="watches" id="fb-watches" onclick="setFilter('watches',this)">Watches</button>
+    <button class="fbtn" data-cat="girls" onclick="setFilter('girls',this)">Girls &amp; Kids</button>
+    <button class="fbtn" data-cat="perfumes" onclick="setFilter('perfumes',this)">Perfumes</button>
+    <button class="fbtn" data-cat="apparel" onclick="setFilter('apparel',this)">Apparel</button>
+    <button class="fbtn" data-cat="sports" onclick="setFilter('sports',this)">Sports Edit</button>
+    <div class="fbar-right">
+      <select class="age-sel" id="ageSel" onchange="applyFilters()">
+        <option value="all">All Ages</option>
+        <option value="kids">Kids (1–5 yrs)</option>
+        <option value="teens">Teens (6–15 yrs)</option>
+        <option value="adults">Adults (16+)</option>
+      </select>
+    </div>
+  </div>
+</div>
+
+<!-- SHOP GRID -->
+<section class="shop">
+  <div class="sh-hd">
+    <div>
+      <div class="sh-ey" id="shEy">The Complete Edit</div>
+      <h2 class="sh-ti" id="shTi">All Collections</h2>
+    </div>
+    <div class="sh-ct" id="shCt"></div>
+  </div>
+  <div class="pgrid" id="pgrid"></div>
+</section>
+
+<!-- EDITORIAL -->
+<section class="editorial" id="editorial">
+  <div>
+    <div class="ed-ey">Our Maison — Since 2008</div>
+    <h2 class="ed-ti">Luxury is not a price.<br>It is a <em>philosophy.</em></h2>
+    <p class="ed-p">Amoura Luxe was founded on a singular conviction: that the most beautiful objects in the world deserve the most beautiful presentation. Every perfume, every timepiece, every couture jersey we carry has been chosen because it represents the absolute pinnacle of its craft — nothing more, nothing less.</p>
+    <div class="ed-stats">
+      <div><div class="sn">18</div><div class="sl">Years of Craft</div></div>
+      <div><div class="sn">94</div><div class="sl">Countries</div></div>
+      <div><div class="sn">14K</div><div class="sl">Private Clients</div></div>
+    </div>
+  </div>
+  <div class="ed-imgs">
+    <div class="ed-img"><img src="https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=800&q=80" alt="Store"/></div>
+    <div class="ed-img"><img src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=600&q=80" alt="Watch"/></div>
+    <div class="ed-img"><img src="https://images.unsplash.com/photo-1590156562745-5a6f40f55e7d?w=600&q=80" alt="Perfume"/></div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="ftop">
+    <div>
+      <div class="fbrand">Amoura Luxe</div>
+      <p class="ftagline">Objects of desire, crafted for those who understand that true luxury is never accidental.</p>
+    </div>
+    <div class="fcol"><h4>Collections</h4><ul>
+      <li><a href="#">Gents Accessories</a></li>
+      <li><a href="#">Swiss Watches</a></li>
+      <li><a href="#">Girls &amp; Kids</a></li>
+      <li><a href="#">Perfumes</a></li>
+      <li><a href="#">Sports Edit</a></li>
+    </ul></div>
+    <div class="fcol"><h4>Services</h4><ul>
+      <li><a href="#">Private Shopping</a></li>
+      <li><a href="#">Bespoke Orders</a></li>
+      <li><a href="#">Gift Concierge</a></li>
+      <li><a href="#">Authentication</a></li>
+      <li><a href="#">Alterations</a></li>
+    </ul></div>
+    <div class="fcol"><h4>Maison</h4><ul>
+      <li><a href="#">Our Story</a></li>
+      <li><a href="#">Ateliers</a></li>
+      <li><a href="#">Sustainability</a></li>
+      <li><a href="#">Careers</a></li>
+      <li><a href="#">Press &amp; Media</a></li>
+    </ul></div>
+  </div>
+  <div class="fbot">
+    <div class="fcp">© 2026 Amoura Luxe. All rights reserved.</div>
+    <div class="fcp">Privacy Policy · Terms of Use · Cookie Settings</div>
+  </div>
+</footer>
+
+</div><!-- /#app -->
+
+<div id="toast"></div>
+
+<!-- CHAT FAB -->
+<button id="cfab" onclick="toggleChat()" title="Amoura Concierge">
+  <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+</button>
+<div id="cwin">
+  <div class="chd">
+    <div class="cavt">✨</div>
+    <div>
+      <div class="ctitle">Amoura Concierge</div>
+      <div class="cst">● Online Now</div>
+    </div>
+    <button class="ccl" onclick="toggleChat()">✕</button>
+  </div>
+  <div class="cmsgs" id="cmsgs"></div>
+  <div class="cinrow">
+    <input class="cinp" id="cinp" placeholder="Ask about collections, shipping, prices…" onkeydown="if(event.key==='Enter')sendChat()"/>
+    <button class="csend" onclick="sendChat()">
+      <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+    </button>
+  </div>
+</div>
+
+<script>
+/* ═══════ PRODUCTS ═══════════════════════════════════════ */
+const PRODUCTS = [
+  /* PERFUMES */
+  {id:1,  name:"Noir Absolu",            sub:"Extrait de Parfum · 100ml",        price:95000,  old:118000, cat:"perfumes", age:"adults", badge:"Bestseller", sale:false,
+   img:"https://images.unsplash.com/photo-1590156562745-5a6f40f55e7d?w=600&q=80"},
+  {id:2,  name:"Oud Imperiale",          sub:"Extrait de Parfum · 50ml",         price:162000, old:null,   cat:"perfumes", age:"adults", badge:"Limited",    sale:false,
+   img:"https://images.unsplash.com/photo-1523293182086-7651a899d37f?w=600&q=80"},
+  {id:3,  name:"Rose Satin",             sub:"Eau de Parfum · 75ml",             price:58000,  old:72000,  cat:"perfumes", age:"adults", badge:"Sale",       sale:true,
+   img:"https://images.unsplash.com/photo-1594035910387-fea47794261f?w=600&q=80"},
+  {id:4,  name:"Amber Elixir",           sub:"Solid Perfume Compact",            price:26000,  old:null,   cat:"perfumes", age:"adults", badge:"Gift",       sale:false,
+   img:"https://images.unsplash.com/photo-1587017539504-67cfbddac569?w=600&q=80"},
+  {id:5,  name:"Musk Velour",            sub:"Luxury Body Cream · 200ml",        price:38000,  old:45000,  cat:"perfumes", age:"adults", badge:null,         sale:true,
+   img:"https://images.unsplash.com/photo-1619451683993-c51a8e1ade6b?w=600&q=80"},
+
+  /* GENTS — WATCHES (also tagged watches) */
+  {id:6,  name:"Patek Philippe Nautilus",sub:"Ref. 5711 · Steel · 40mm",        price:8500000,old:null,   cat:"watches",  age:"adults", badge:"Ultra Rare", sale:false,
+   img:"https://images.unsplash.com/photo-1533139502658-0198f920d8e8?w=600&q=80"},
+  {id:7,  name:"Rolex Submariner",       sub:"Ref. 126610LN · Ceramic · 41mm",  price:3200000,old:null,   cat:"watches",  age:"adults", badge:"Iconic",     sale:false,
+   img:"https://images.unsplash.com/photo-1547996160-81dfa63595aa?w=600&q=80"},
+  {id:8,  name:"Chronos I by Amoura",    sub:"Swiss Auto ETA 2824 · 42mm",      price:1180000,old:null,   cat:"watches",  age:"adults", badge:"New",        sale:false,
+   img:"https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=600&q=80"},
+
+  /* GENTS — ACCESSORIES */
+  {id:9,  name:"The Attaché",            sub:"Full-grain Leather Briefcase",     price:275000, old:335000, cat:"gents",    age:"adults", badge:"Sale",       sale:true,
+   img:"https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=600&q=80"},
+  {id:10, name:"Velour Cufflinks",       sub:"18k Gold Plated · Set of 2",       price:89000,  old:null,   cat:"gents",    age:"adults", badge:null,         sale:false,
+   img:"https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?w=600&q=80"},
+  {id:11, name:"Onyx Carbon Wallet",     sub:"Carbon Fibre & Calfskin",          price:106000, old:null,   cat:"gents",    age:"adults", badge:null,         sale:false,
+   img:"https://images.unsplash.com/photo-1627123424574-724758594e93?w=600&q=80"},
+  {id:12, name:"Le Caprice Belt",        sub:"Python Embossed Leather",          price:128000, old:null,   cat:"gents",    age:"adults", badge:null,         sale:false,
+   img:"https://images.unsplash.com/photo-1624222247344-550fb60583dc?w=600&q=80"},
+
+  /* GIRLS & KIDS */
+  {id:13, name:"Princess Robe",          sub:"Silk Organza · Ages 4–10",         price:78000,  old:95000,  cat:"girls",    age:"kids",   badge:"Bestseller", sale:true,
+   img:"https://images.unsplash.com/photo-1518831959646-742c3a14ebf7?w=600&q=80"},
+  {id:14, name:"Rosette Tiara",          sub:"Crystal & Rose Gold",              price:53000,  old:null,   cat:"girls",    age:"kids",   badge:"New",        sale:false,
+   img:"https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=600&q=80"},
+  {id:15, name:"Bloom Sneakers",         sub:"Ages 3–12 · Pastel Pink",          price:40000,  old:50000,  cat:"girls",    age:"kids",   badge:null,         sale:true,
+   img:"https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=600&q=80"},
+  {id:16, name:"Stella Ballerinas",      sub:"Satin · Girls Ages 2–8",           price:46000,  old:58000,  cat:"girls",    age:"kids",   badge:null,         sale:true,
+   img:"https://images.unsplash.com/photo-1551107696-a4b0c5a0d9a2?w=600&q=80"},
+
+  /* APPAREL */
+  {id:17, name:"The Reverie Coat",       sub:"Cashmere Blend · Camel",           price:520000, old:null,   cat:"apparel",  age:"adults", badge:"New Season", sale:false,
+   img:"https://images.unsplash.com/photo-1539533018447-63fcce2678e3?w=600&q=80"},
+  {id:18, name:"Azure Suit",             sub:"Italian Wool · Slim Fit",          price:392000, old:476000, cat:"apparel",  age:"adults", badge:"Sale",       sale:true,
+   img:"https://images.unsplash.com/photo-1617127365659-c47fa864d8bc?w=600&q=80"},
+  {id:19, name:"Lumière Evening Gown",   sub:"Duchess Satin · Floor Length",     price:672000, old:null,   cat:"apparel",  age:"adults", badge:"Exclusive",  sale:false,
+   img:"https://images.unsplash.com/photo-1558769132-cb1aea458c5e?w=600&q=80"},
+  {id:20, name:"Midnight Blazer",        sub:"Virgin Wool · Midnight Blue",      price:249000, old:null,   cat:"apparel",  age:"adults", badge:null,         sale:false,
+   img:"https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=600&q=80"},
+
+  /* SPORTS */
+  {id:21, name:"Ronaldo · Al Nassr",     sub:"Luxury Couture Jersey · Silk",     price:185000, old:220000, cat:"sports",   age:"adults", badge:"CR7",        sale:true,
+   img:"https://images.unsplash.com/photo-1612036782180-6f0b6cd846fe?w=600&q=80"},
+  {id:22, name:"Ronaldo · Portugal NT",  sub:"Hand-stitched Silk · Gold Thread", price:195000, old:null,   cat:"sports",   age:"adults", badge:"CR7",        sale:false,
+   img:"https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=600&q=80"},
+  {id:23, name:"Messi · Inter Miami",    sub:"Gold Thread Couture Edition",      price:178000, old:205000, cat:"sports",   age:"adults", badge:"Leo 10",     sale:true,
+   img:"https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=600&q=80"},
+  {id:24, name:"Messi · Argentina NT",   sub:"Albiceleste Satin · Limited",      price:192000, old:null,   cat:"sports",   age:"adults", badge:"Leo 10",     sale:false,
+   img:"https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=600&q=80"},
+  {id:25, name:"Neymar · Al Hilal",      sub:"Royal Silk Couture Edition",       price:165000, old:195000, cat:"sports",   age:"adults", badge:"NJR 10",     sale:true,
+   img:"https://images.unsplash.com/photo-1570498839593-e565b39455fc?w=600&q=80"},
+  {id:26, name:"Neymar · Brazil NT",     sub:"Canary Silk & Gold · Hand-stitched",price:172000,old:null,   cat:"sports",   age:"adults", badge:"NJR 10",     sale:false,
+   img:"https://images.unsplash.com/photo-1529900748604-07564a03e7a6?w=600&q=80"},
+];
+
+/* ═══════ FILTER LABELS ══════════════════════════════════ */
+const LABELS = {
+  all:     {ey:"The Complete Edit",              ti:"All Collections"},
+  gents:   {ey:"Gents — Accessories & Leather",  ti:"The Gents Edit"},
+  watches: {ey:"Horological Excellence",         ti:"Swiss Timepieces"},
+  girls:   {ey:"Girls & Kids — Royal Pink",      ti:"Little Royals"},
+  perfumes:{ey:"Perfumes & Cosmetics",           ti:"The Fragrance Atelier"},
+  apparel: {ey:"Shoes & Apparel",                ti:"The Wardrobe"},
+  sports:  {ey:"Luxury Sports Edit",             ti:"Icons in Couture"},
+};
+const COL_NAME = {gents:"Gents",watches:"Watches",girls:"Girls & Kids",perfumes:"Perfumes",apparel:"Apparel",sports:"Sports Edit"};
+
+/* ═══════ STATE ══════════════════════════════════════════ */
+let cartQty=0, curCat="all", chatOpen=false;
+
+/* ═══════ LOGIN ══════════════════════════════════════════ */
+function doLogin(){
+  document.getElementById("lw").classList.add("out");
+  const a=document.getElementById("app"); a.classList.add("on");
+  setTimeout(()=>document.getElementById("lw").style.display="none",900);
+  setTimeout(()=>addBot("Welcome to Amoura Luxe. I am your personal concierge. How may I assist you with our collections today?"),2200);
+}
+
+/* ═══════ HERO ═══════════════════════════════════════════ */
+const slides=[0,1,2,3].map(i=>document.getElementById("sl"+i));
+const hdots=document.querySelectorAll(".hdot");
+let sN=0;
+function goSlide(n){slides[sN].classList.remove("on");hdots[sN].classList.remove("on");sN=n;slides[sN].classList.add("on");hdots[sN].classList.add("on");}
+setInterval(()=>goSlide((sN+1)%4),6500);
+
+/* ═══════ FILTER ═════════════════════════════════════════ */
+function filterClick(cat){
+  const btn=document.querySelector(`[data-cat="${cat}"]`);
+  if(btn) setFilter(cat,btn);
+  document.getElementById("shop").scrollIntoView({behavior:"smooth"});
+}
+function setFilter(cat,btn){
+  curCat=cat;
+  document.querySelectorAll(".fbtn").forEach(b=>b.classList.remove("on"));
+  btn.classList.add("on");
+  const lbl=LABELS[cat]||LABELS.all;
+  document.getElementById("shEy").textContent=lbl.ey;
+  document.getElementById("shTi").textContent=lbl.ti;
+  applyFilters();
+}
+function applyFilters(){
+  const age=document.getElementById("ageSel").value;
+  /* watches filter = cat:"watches"; gents filter = cat:"gents" only (no watches) */
+  const list=PRODUCTS.filter(p=>{
+    const catOk= curCat==="all"? true : p.cat===curCat;
+    const ageOk= age==="all"? true : p.age===age;
+    return catOk && ageOk;
+  });
+  document.getElementById("shCt").textContent=list.length+" Piece"+(list.length!==1?"s":"");
+  renderGrid(list);
+}
+
+/* ═══════ GRID ═══════════════════════════════════════════ */
+function fmt(n){return "Rs. "+n.toLocaleString("en-PK")}
+function renderGrid(list){
+  const g=document.getElementById("pgrid");
+  g.innerHTML="";
+  if(!list.length){
+    g.innerHTML=`<div class="empty"><svg width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>No pieces match this selection.</div>`;
+    return;
+  }
+  list.forEach(p=>{
+    const d=document.createElement("div");
+    d.className="pcard";
+    d.innerHTML=`
+      <div class="cimgwrap">
+        <img src="${p.img}" alt="${p.name}" loading="lazy" onerror="this.style.display='none'"/>
+        ${p.badge?`<div class="cbdg${p.sale?" sale":""}">${p.badge}</div>`:""}
+        <div class="cov"><button class="qv" onclick="addCart(${p.id},this.closest('.pcard').querySelector('.addbtn'))">Add to Bag</button></div>
+      </div>
+      <div class="cbody">
+        <div class="ccol">${COL_NAME[p.cat]||p.cat}</div>
+        <div class="cname">${p.name}</div>
+        <div class="csub">${p.sub}</div>
+        <div class="cft">
+          <div>
+            <span class="cprice">${fmt(p.price)}</span>
+            ${p.old?`<span class="cold">${fmt(p.old)}</span>`:""}
+          </div>
+          <button class="addbtn" onclick="addCart(${p.id},this)">Add to Bag</button>
+        </div>
+      </div>`;
+    g.appendChild(d);
+  });
+}
+
+/* ═══════ CART ═══════════════════════════════════════════ */
+function addCart(id,btn){
+  cartQty++;
+  const b=document.getElementById("cbadge");
+  b.textContent=cartQty; b.classList.remove("pop"); void b.offsetWidth; b.classList.add("pop");
+  if(btn){btn.textContent="✓ Added";btn.classList.add("done");setTimeout(()=>{btn.textContent="Add to Bag";btn.classList.remove("done");},1800);}
+  const p=PRODUCTS.find(x=>x.id===id);
+  showToast(`"${p.name}" added to your bag`);
+}
+function openCart(){showToast(cartQty===0?"Your bag is empty":`${cartQty} item${cartQty>1?"s":""} in your bag`);}
+
+/* ═══════ TOAST ══════════════════════════════════════════ */
+let tT;
+function showToast(m){const t=document.getElementById("toast");t.textContent=m;t.classList.add("on");clearTimeout(tT);tT=setTimeout(()=>t.classList.remove("on"),2800);}
+
+/* ═══════ AI CHAT ════════════════════════════════════════ */
+const R={
+  shipping:"We deliver to over 94 countries including Pakistan. Complimentary express shipping on all orders above Rs. 50,000. Delivery takes 2–5 business days, with same-day concierge service available in Karachi, Lahore, and Islamabad.",
+  perfume:"Our most celebrated fragrance is Oud Imperiale — hand-distilled extrait from sustainably harvested Assam oud at Rs. 162,000. Our bestseller, Noir Absolu, blends aged patchouli, black amber, and rare leather at Rs. 95,000. Both are in hand-blown Murano crystal flacons.",
+  returns:"We offer 30-day complimentary returns on all standard pieces. Bespoke and engraved items are final sale. Return packaging is provided and our couriers collect directly from your address.",
+  price:"Our PKR prices begin at Rs. 26,000 for our smallest accessories and reach Rs. 8,500,000 for the Patek Philippe Nautilus. Instalment plans are available. All pieces include a certificate of authenticity.",
+  watch:"Our crown jewel is the Patek Philippe Nautilus at Rs. 8,500,000 — one of the rarest watches ever made. The Rolex Submariner sits at Rs. 3,200,000. Both come with full authentication documentation and original packaging.",
+  bespoke:"Our Bespoke Atelier allows you to personalise any piece — from engraving initials to commissioning an original fragrance formulation. Allow 4–6 weeks. A dedicated advisor will guide every step.",
+  kids:"Our Girls & Kids collection uses the softest silk organza with rose-gold embellishments, handstitched in sizes from 18 months to age 12. Every garment arrives gift-boxed with a personalised note.",
+  sports:"Our Sports Edit features luxury couture jerseys for Cristiano Ronaldo (Al Nassr & Portugal), Lionel Messi (Inter Miami & Argentina), and Neymar Jr (Al Hilal & Brazil). Each is hand-stitched in premium silk with gold thread — sport meets high fashion.",
+  ronaldo:"We carry two Ronaldo pieces: Al Nassr Couture Edition at Rs. 185,000 and Portugal NT Hand-stitched Silk at Rs. 195,000. Both arrive in a premium collector's box.",
+  messi:"Messi pieces: Inter Miami Gold Thread Edition at Rs. 178,000 and Argentina NT Albiceleste Satin at Rs. 192,000. Both are limited edition with authentication cards.",
+  neymar:"Neymar Jr: Al Hilal Royal Silk Edition at Rs. 165,000 and Brazil NT Canary Silk & Gold at Rs. 172,000 — a stunning tribute to the world's most creative footballer.",
+  hello:"Good day. Welcome to the Amoura Luxe private concierge. It is a genuine pleasure. How may I assist you today?",
+  def:["Thank you for your enquiry. Our private client advisors are always delighted to assist — ask me about any collection, price, or service.","Of course. At Amoura Luxe every detail is attended to with the utmost care. Allow me to help you further.","Whether it is a timepiece, a fragrance, or a couture jersey — I am here to guide you to the perfect piece."]
+};
+function match(m){
+  m=m.toLowerCase();
+  if(/hello|hi |hey|salam|good (morning|afternoon|evening)/.test(m)) return R.hello;
+  if(/ship|deliver|country|international/.test(m)) return R.shipping;
+  if(/perfume|fragrance|oud|scent|musk|cologne/.test(m)) return R.perfume;
+  if(/return|refund|exchange/.test(m)) return R.returns;
+  if(/price|cost|how much|pkr|rupee|budget/.test(m)) return R.price;
+  if(/watch|patek|rolex|nautilus|submariner|timepiece/.test(m)) return R.watch;
+  if(/bespoke|custom|personalise|engrav/.test(m)) return R.bespoke;
+  if(/kid|girl|child|baby|princess|daughter/.test(m)) return R.kids;
+  if(/sport|jersey|football|soccer/.test(m)) return R.sports;
+  if(/ronaldo|cr7|nassr|portugal/.test(m)) return R.ronaldo;
+  if(/messi|leo|miami|argentina/.test(m)) return R.messi;
+  if(/neymar|njr|hilal|brazil/.test(m)) return R.neymar;
+  return R.def[Math.floor(Math.random()*R.def.length)];
+}
+function toggleChat(){
+  chatOpen=!chatOpen;
+  document.getElementById("cwin").classList.toggle("on",chatOpen);
+  if(chatOpen&&!document.getElementById("cmsgs").children.length)
+    setTimeout(()=>addBot("Welcome to Amoura Luxe. I'm your personal concierge. How may I assist you today?"),340);
+}
+function ts(){const n=new Date();return n.getHours().toString().padStart(2,"0")+":"+n.getMinutes().toString().padStart(2,"0");}
+function addBot(text){
+  const box=document.getElementById("cmsgs");
+  const t=document.createElement("div"); t.className="cmsg b";
+  t.innerHTML=`<div class="typi"><div class="td"></div><div class="td"></div><div class="td"></div></div>`;
+  box.appendChild(t); box.scrollTop=9999;
+  const delay=Math.min(900+text.length*13,2200);
+  setTimeout(()=>{
+    t.remove();
+    const m=document.createElement("div"); m.className="cmsg b";
+    m.innerHTML=`<div class="mb"></div><div class="mt">${ts()}</div>`;
+    box.appendChild(m); box.scrollTop=9999;
+    const bub=m.querySelector(".mb"); let i=0;
+    (function tw(){if(i<text.length){bub.textContent+=text[i++];box.scrollTop=9999;setTimeout(tw,17);}})();
+  },delay);
+}
+function sendChat(){
+  const inp=document.getElementById("cinp"), txt=inp.value.trim();
+  if(!txt) return;
+  const box=document.getElementById("cmsgs");
+  const m=document.createElement("div"); m.className="cmsg u";
+  m.innerHTML=`<div class="mb">${txt}</div><div class="mt">${ts()}</div>`;
+  box.appendChild(m); box.scrollTop=9999; inp.value="";
+  setTimeout(()=>addBot(match(txt)),180);
+}
+
+/* ═══════ INIT ═══════════════════════════════════════════ */
+applyFilters();
+</script>
+</body>
+</html>
